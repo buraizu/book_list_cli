@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "./lib/book_list_cli"
+BookListCli::CLI.new.call
