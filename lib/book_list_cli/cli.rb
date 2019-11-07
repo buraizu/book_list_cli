@@ -2,63 +2,87 @@
 require 'googlebooks'
 class BookListCli::CLI
     @@reading_list = []
+    @@searches = 0
 
     def call
-        menu
+        menu_options
         goodbye
     end
 
     def save(book)
         @@reading_list.push(book)
-        puts "Reading List is now: #{@@reading_list}"
+        puts "Your reading list is now: #{@@reading_list.size} items long."
+    end
+
+    def display_books(books)
+        book_index = 0
+        books.each do |book|
+            puts "#{book_index += 1}. #{book.title} by #{book.authors}."
+            puts "Publisher: #{book.publisher}"
+        end 
+    end
+
+    def save_books(books)
+        if books.total_items > 0
+        books.each do |book|
+            new_book = BookListCli::Book.new
+            new_book.title = book.title
+            new_book.authors = book.authors || "Unknown Author(s)"
+            new_book.publisher = book.publisher || "Unknown Publisher"
+            
+            new_book.save
+        end
+        else
+            puts "No books were returned, check your spelling or try another query."
+            false
+        end
     end
 
     def search
-        puts "Enter your search query"
-        index = 0    
+        puts "Enter your search query"  
         input = gets.strip
         books = GoogleBooks.search(input, {:count => 5})
-        books.each do |book|
-            puts "#{index += 1}"
-            puts "Author: #{book.authors}"
-            puts "Title: #{book.title}"
-            puts "Publisher: #{book.publisher}"
+        if save_books(books)
+            display_books(books)
+            puts "Would you like to save a book to your reading list? Enter the number above, or enter any other key to return to the menu."
+            choice = gets.strip.downcase
+            case choice
+            when /[1-5]/
+                base_index = @@searches * 5
+                chosen_book = BookListCli::Book.all[(choice.to_i - 1) + base_index]
+                save(chosen_book)
+                puts "Book saved to reading list: #{chosen_book.title}"
+                @@searches += 1
+            when /[^1-5]/
+                return
+            end
         end
-
-        puts "Would you like to save a book to your reading list? Enter the number above"
-            input2 = gets.strip
-            save(input2)
     end
 
     def reading_list
-        reading_list_index = 0
         if @@reading_list.size > 0
-            puts "Here is your reading list"
-            @@reading_list.each do |book|
-                puts "#{reading_list_index += 1}"
-                puts "Author: #{book.authors}"
-                puts "Title: #{book.title}"
-                puts "Publisher: #{book.publisher}" 
-            end
-        else 
-            puts "You currently have no books saved to your reading list."
+            puts "-- Your Reading List --"
+            display_books(@@reading_list)
+        else
+            puts "Nothing on your reading list yet."
         end
     end
 
-    def menu
-        input = nil
-        puts "Enter 1 to search for books, or 2 to see your reading list, or 'exit'"
-        input = gets.strip
-        while input != "exit"
-           case input
-           when "1"
-            search
-           when "2"
-            reading_list
-           end
-        end
-
-        goodbye
+    def menu_options
+        
+        loop do
+            puts "1 - Search, 2 - Reading List, or 'exit'"
+            input = gets.strip.downcase
+            break if input == "quit" || input == "exit"
+            case input
+            when "1"
+              search
+            when "2"
+              reading_list
+            else
+              puts "invalid_input: #{input}"
+            end
+          end
     end
 
     def goodbye
