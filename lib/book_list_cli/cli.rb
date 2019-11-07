@@ -11,7 +11,6 @@ class BookListCli::CLI
 
     def save(book)
         @@reading_list.push(book)
-        puts "Your reading list is now: #{@@reading_list.size} items long."
     end
 
     def display_books(books)
@@ -29,7 +28,6 @@ class BookListCli::CLI
             new_book.title = book.title
             new_book.authors = book.authors || "Unknown Author(s)"
             new_book.publisher = book.publisher || "Unknown Publisher"
-            
             new_book.save
         end
         else
@@ -44,22 +42,11 @@ class BookListCli::CLI
         books = GoogleBooks.search(input, {:count => 5})
         if save_books(books)
             display_books(books)
-            puts "Would you like to save a book to your reading list? Enter the number above, or enter any other key to return to the menu."
-            choice = gets.strip.downcase
-            case choice
-            when /[1-5]/
-                base_index = @@searches * 5
-                chosen_book = BookListCli::Book.all[(choice.to_i - 1) + base_index]
-                save(chosen_book)
-                puts "Book saved to reading list: #{chosen_book.title}"
-                @@searches += 1
-            when /[^1-5]/
-                return
-            end
+            save_to_reading_list?
         end
     end
 
-    def reading_list
+    def display_reading_list
         if @@reading_list.size > 0
             puts "-- Your Reading List --"
             display_books(@@reading_list)
@@ -68,8 +55,23 @@ class BookListCli::CLI
         end
     end
 
+    def save_to_reading_list?
+        puts "Would you like to save a book to your reading list? Enter the number above, or enter any other key to return to the menu."
+        choice = gets.strip.downcase
+            case choice
+            when /[1-5]/
+                base_index = @@searches * 5
+                chosen_book = BookListCli::Book.all[(choice.to_i - 1) + base_index]
+                save(chosen_book)
+                puts "Book saved: #{chosen_book.title}. You now have #{@@reading_list.size} items on your reading list."
+                @@searches += 1
+            when /[^1-5]/
+                @@searches += 1
+                return
+            end
+    end
+
     def menu_options
-        
         loop do
             puts "1 - Search, 2 - Reading List, or 'exit'"
             input = gets.strip.downcase
@@ -78,7 +80,7 @@ class BookListCli::CLI
             when "1"
               search
             when "2"
-              reading_list
+              display_reading_list
             else
               puts "invalid_input: #{input}"
             end
