@@ -5,6 +5,7 @@ class BookListCli::CLI
     @@searches = 0
 
     def call
+        welcome
         menu_options
         goodbye
     end
@@ -15,9 +16,11 @@ class BookListCli::CLI
 
     def display_books(books)
         book_index = 0
+        puts " -- -- -- -- -- "
         books.each do |book|
             puts "#{book_index += 1}. #{book.title} by #{book.authors}."
             puts "Publisher: #{book.publisher}"
+            puts " -- -- -- -- -- "
         end 
     end
 
@@ -37,10 +40,11 @@ class BookListCli::CLI
     end
 
     def search
-        puts "Enter your search query"  
+        puts "Please enter your search query:"  
         input = gets.strip
         books = GoogleBooks.search(input, {:count => 5})
         if save_books(books)
+            puts "Your search has returned the following results:"
             display_books(books)
             save_to_reading_list?
         end
@@ -51,29 +55,34 @@ class BookListCli::CLI
             puts "-- Your Reading List --"
             display_books(@@reading_list)
         else
-            puts "Nothing on your reading list yet."
+            puts " -- There is currently nothing on your reading list. -- "
         end
     end
 
     def save_to_reading_list?
-        puts "Would you like to save a book to your reading list? Enter the number above, or enter any other key to return to the menu."
-        choice = gets.strip.downcase
-            case choice
-            when /[1-5]/
-                base_index = @@searches * 5
-                chosen_book = BookListCli::Book.all[(choice.to_i - 1) + base_index]
+        puts "To save a book to your reading list, simply enter its number." 
+        puts "Example: Enter '25' to save books numbered 2 and 5."
+        puts "Enter any other key to return to the menu."
+        puts " -- -- -- -- -- "
+        choices = gets.strip.split('').sort
+        base_index = @@searches * 5
+        @@searches += 1
+        
+        choices.each.with_index do |c, i|
+            if /[1-5]/.match(c) && choices[i + 1] != c
+                chosen_book = BookListCli::Book.all[(c.to_i - 1) + base_index]
                 save(chosen_book)
-                puts "Book saved: #{chosen_book.title}. You now have #{@@reading_list.size} items on your reading list."
-                @@searches += 1
-            when /[^1-5]/
-                @@searches += 1
-                return
+                puts " -- Book saved: #{chosen_book.title} by #{chosen_book.authors}"
             end
+        end
     end
 
     def menu_options
         loop do
-            puts "1 - Search, 2 - Reading List, or 'exit'"
+            puts "1 - Search"
+            puts "2 - View Reading List"
+            puts "'exit' or 'quit' when finished"
+            puts " -- -- -- -- -- "
             input = gets.strip.downcase
             break if input == "quit" || input == "exit"
             case input
@@ -85,6 +94,13 @@ class BookListCli::CLI
               puts "invalid_input: #{input}"
             end
           end
+    end
+
+    def welcome
+        puts " -- -- -- -- -- "
+        puts "Welcome to BookListCLI! Query the GoogleBooks API and construct your own reading list."
+        puts "Enter your selection below."
+        puts " -- -- -- -- -- "
     end
 
     def goodbye
