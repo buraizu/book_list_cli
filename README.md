@@ -13,7 +13,7 @@ On the other hand, if none of them catch your fancy, enter any other key and you
 To run this app on your machine, clone the repo onto a local folder with `git clone https://github.com/buraizu/book_list_cli.git`.
 Change directories into book_list_cli, and run 'bundle' to install project dependencies.
 
-Finally, enter './bin/book_list_cli' to get the app started. Enjoy your books!
+Finally, enter `./bin/book_list_cli` to get the app started. Enjoy your books!
 
 ## Contributing
 
