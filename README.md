@@ -1,8 +1,12 @@
 # BookListCli
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/book_list_cli`. To experiment with that code, run `bin/console` for an interactive prompt.
+Welcome to BookListCli!  
 
-TODO: Delete this and the text above, and describe your gem
+This app submits your query to the GoogleBooks API and returns five results, complete with title, author(s), and publisher.
+
+If any of these books look interesting to you, simply enter its corresponding number (1 - 5) into the prompt and it will be saved to your own custom reading list.  Save as many books as you like, even all five!  Just enter all their numbers together: 12345.
+
+On the other hand, if none of them catch your fancy, enter any other key and you'll be brought back to the menu.  Peruse your reading list, or search for more books!
 
 ## Installation
 
