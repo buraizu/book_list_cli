@@ -1,5 +1,3 @@
-require 'googlebooks'
-
 class BookListCli::CLI
     @@reading_list = []
     @@searches = 0
@@ -20,13 +18,15 @@ class BookListCli::CLI
             break if input == "quit" || input == "exit"
             case input
             when "1"
-              search
+              books = BookListCli::Search.new.query
+              display_books(books)
+              save_to_reading_list?
             when "2"
               display_reading_list
             else
               puts "Invalid input: #{input}"
             end
-          end
+        end
     end
 
     def display_books(books)
@@ -52,21 +52,6 @@ class BookListCli::CLI
         @@reading_list.push(book)
     end
 
-    def save_books(books)
-        if books.total_items > 0
-        books.each do |book|
-            new_book = BookListCli::Book.new
-            new_book.title = book.title
-            new_book.authors = book.authors || "Unknown Author(s)"
-            new_book.publisher = book.publisher || "Unknown Publisher"
-            new_book.save
-        end
-        else
-            puts "No books were returned, check your spelling or try another query."
-            false
-        end
-    end
-
     def save_to_reading_list?
         puts "To save a book to your reading list, simply enter its number." 
         puts "Example: Enter '25' to save books numbered 2 and 5."
@@ -81,17 +66,6 @@ class BookListCli::CLI
                 save(chosen_book)
                 puts " -- Book saved: #{chosen_book.title} by #{chosen_book.authors}"
             end
-        end
-    end
-
-    def search
-        puts "Please enter your search query:"  
-        input = gets.strip
-        books = GoogleBooks.search(input, {:count => 5})
-        if save_books(books)
-            puts "Your search has returned the following results:"
-            display_books(books)
-            save_to_reading_list?
         end
     end
 
