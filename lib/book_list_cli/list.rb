@@ -1,7 +1,5 @@
 class BookListCli::List
 
-    attr_accessor :books
-
     @@books = []
     @@searches = 0
 
@@ -26,7 +24,7 @@ class BookListCli::List
         end
     end
 
-    def display_books(books)
+    def list_books(books)
         book_index = 0
         puts " -- -- -- -- -- "
         books.each do |book|
@@ -39,7 +37,7 @@ class BookListCli::List
     def display_reading_list
         if @@books.size > 0
             puts "-- Your Reading List --"
-            display_books(@@books)
+            list_books(@@books)
         else
             puts " -- There is currently nothing on your reading list. -- "
         end

@@ -2,8 +2,6 @@ require 'googlebooks'
 
 class BookListCli::CLI
 
-    @@list
-    
     def call
         welcome
         @@list = BookListCli::List.new
@@ -30,29 +28,29 @@ class BookListCli::CLI
         end
     end
 
-    def save_books(books)
-        if books.total_items > 0
-        books.each do |book|
-            new_book = BookListCli::Book.new
-            new_book.title = book.title
-            new_book.authors = book.authors || "Unknown Author(s)"
-            new_book.publisher = book.publisher || "Unknown Publisher"
-            new_book.save
-        end
-        else
-            puts "No books were returned, check your spelling or try another query."
-            false
-        end
-    end
-
     def search
         puts "Please enter your search query:"  
         input = gets.strip
         books = GoogleBooks.search(input, {:count => 5})
         if save_books(books)
             puts "Your search has returned the following results:"
-            @@list.display_books(books)
+            @@list.list_books(books)
             @@list.reading_list_options
+        end
+    end
+
+    def save_books(books)
+        if books.total_items > 0
+            books.each do |book|
+                new_book = BookListCli::Book.new
+                new_book.title = book.title
+                new_book.authors = book.authors || "Unknown Author(s)"
+                new_book.publisher = book.publisher || "Unknown Publisher"
+                new_book.save
+            end
+        else
+            puts "No books were returned, check your spelling or try another query."
+            false
         end
     end
 
