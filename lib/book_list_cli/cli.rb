@@ -4,12 +4,12 @@ class BookListCli::CLI
 
     def call
         welcome
-        @@list = BookListCli::List.new
         menu_options
         goodbye
     end
 
     def menu_options
+        @@list = BookListCli::List.new
         loop do
             puts "1 - Search"
             puts "2 - View Reading List"
